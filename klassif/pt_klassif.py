@@ -102,4 +102,5 @@ def run_test(col_iter):
     arr = np.array(res_func)
     return arr
 
-# print(run_test(1))
+if __name__ == '__main__':
+    print(run_test(2))

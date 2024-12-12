@@ -5,6 +5,7 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 import tensorflow as tf
 import numpy as np
 import time as tm
+import keras
 
 
 class DenseNN(tf.Module):
@@ -43,12 +44,28 @@ class SequentialModule(tf.Module):
     def __call__(self, x):
         return self.layer_2(self.layer_1(x))
 
+# Так как  готовый датасет выгрузить на гитхаб нет технической возможности, ограничение по размеру файлов до 100 мб
+# я закомментировал следующий код:
+# x_train = np.load('npy/mnist_x_train.npy')
+# y_train = np.load('npy/mnist_y_train.npy')
+#
+# x_test = np.load('npy/mnist_x_test.npy')
+# y_test = np.load('npy/mnist_y_test.npy')
 
-x_train = np.load('npy/mnist_x_train.npy')
-y_train = np.load('npy/mnist_y_train.npy')
+# Будем загружать данные из библиотеки keras и приводить к нужному нам виду.
+mnist = keras.datasets.mnist
+to_categorical = keras.utils.to_categorical
 
-x_test = np.load('npy/mnist_x_test.npy')
-y_test = np.load('npy/mnist_y_test.npy')
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+x_train = x_train / 255
+x_test = x_test / 255
+
+x_train = tf.reshape(tf.cast(x_train, tf.float32), [-1, 28*28])
+x_test = tf.reshape(tf.cast(x_test, tf.float32), [-1, 28*28])
+
+y_train = to_categorical(y_train, 10)
+y_test = to_categorical(y_train, 10)
 
 model = SequentialModule()
 
@@ -101,4 +118,5 @@ def run_test(col_iter):
     arr = np.array(res_func)
     return arr
 
-# print(run_test(1))
+if __name__ == '__main__':
+    print(run_test(2))
